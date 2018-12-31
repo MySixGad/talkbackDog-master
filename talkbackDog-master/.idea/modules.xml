@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Android_PCM_Record_Play-master.iml" filepath="$PROJECT_DIR$/Android_PCM_Record_Play-master.iml" />
+      <module fileurl="file://F:\git_file\Android_PCM_Record_Play-master\Android_PCM_Record_Play-master\PCMTest.iml" filepath="F:\git_file\Android_PCM_Record_Play-master\Android_PCM_Record_Play-master\PCMTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/soundtouchandroid/soundtouchandroid.iml" filepath="$PROJECT_DIR$/soundtouchandroid/soundtouchandroid.iml" />
+    </modules>
+  </component>
+</project>
