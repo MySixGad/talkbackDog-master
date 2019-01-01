@@ -17,7 +17,7 @@ buildscript {
 }
 
 allprojects { 
-    repositories {
+    repositories { 
         jcenter()
         google()
     }
