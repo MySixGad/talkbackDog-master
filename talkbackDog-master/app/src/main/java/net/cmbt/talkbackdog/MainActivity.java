@@ -19,11 +19,13 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.cmbt.talkbackdog.R;
+import net.cmbt.talkbackdog.R;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -37,10 +39,13 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 public class MainActivity extends AppCompatActivity {
@@ -62,13 +67,16 @@ public class MainActivity extends AppCompatActivity {
     private String local = Environment.getExternalStorageDirectory().getAbsolutePath() + "/record/local";
     private String message = Environment.getExternalStorageDirectory().getAbsolutePath() + "/record/message";
     private HashMap<String, File> datas;
-    private ArrayList<DatasBean>    datasBeans = new ArrayList<>();
+    private ArrayList<DatasBean> datasBeans = new ArrayList<>();
     private MainActivity.myAdapter myAdapter;
     private File file_local;
     private File file_lmessage;
     private TextView ip_change;
     private AlertDialog show;
     private TextView ip_ssds;
+    private LinearLayout show1;
+    private LinearLayout show2;
+    boolean TAG_T = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
         ip_change = (TextView) findViewById(R.id.ip_change);
         ip_ssds = (TextView) findViewById(R.id.ip_ssds);
         lv = (ListView) findViewById(R.id.lv);
+        show1 = (LinearLayout) findViewById(R.id.show1);
+        show2 = (LinearLayout) findViewById(R.id.show2);
         mBuffer = new byte[BUFFER_SIZE];
 
         file_local = new File(local);
@@ -98,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences userSettings = getSharedPreferences("ip_db", 0);
         SharedPreferences.Editor editor = userSettings.edit();
-        editor.putString("ip", "192.168.0.101");
+        editor.putString("ip", "192.168.199.159");
         editor.commit();
 
 
@@ -168,7 +178,9 @@ public class MainActivity extends AppCompatActivity {
 
                         mAudioUtil.stopRecord();
                         mAudioUtil.convertWavFile();
-
+                        TAG_T = false;
+                        show1.setVisibility(View.INVISIBLE);
+                        show2.setVisibility(View.INVISIBLE);
                     }
                     case KeyEvent.ACTION_DOWN: {
                         //松开事件发生后执行代码的区域
@@ -191,10 +203,42 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         mStartRecordBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
                 Log.e("执行zh9ixing执行zh9ixing", "执行zh9ixing");
+
+                TAG_T = true;
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        while (TAG_T) {
+                            try {
+                                Thread.sleep(100);
+
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (show1.getVisibility() == View.VISIBLE) {
+                                            show1.setVisibility(View.INVISIBLE);
+                                            show2.setVisibility(View.INVISIBLE);
+                                        } else {
+                                            show1.setVisibility(View.VISIBLE);
+                                            show2.setVisibility(View.VISIBLE);
+                                        }
+
+                                    }
+                                });
+
+
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }).start();
 
                 mAudioFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
                         + "/record/local/selfRecord_" + chat_index + ".pcm");
@@ -221,9 +265,7 @@ public class MainActivity extends AppCompatActivity {
                 lv.setSelection(datasBeans.size() - 1);
             }
         });
-
         createFileServerSocket();//监听 收文件
-
     }
 
 
@@ -254,6 +296,24 @@ public class MainActivity extends AppCompatActivity {
                 item = View.inflate(viewGroup.getContext(), R.layout.item_right, null);
             }
 
+            TextView time = (TextView) item.findViewById(R.id.time);
+            TextView tie_vice = (TextView) item.findViewById(R.id.tie_vice);
+            ImageView llls = (ImageView) item.findViewById(R.id.llls);
+            time.setText(getDateTimeByMillisecond(datasBeans.get(i).getCreateTime()));
+
+            long count = datasBeans.get(i).getFile().length() / 44100 / 4;
+            if (count < 1)
+                count = 1;
+            tie_vice.setText(count + "s");
+
+            if (count < 2)
+                count = 2;
+
+            if (count > 7)
+                count = 7;
+            ViewGroup.LayoutParams para = llls.getLayoutParams();
+            para.width = 100 * (int) count + 100;
+            llls.setLayoutParams(para);
             return item;
         }
 
@@ -264,7 +324,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         SharedPreferences userSettings = getSharedPreferences("ip_db", 0);
-        String name = userSettings.getString("ip", "192.168.0.101");
+        String name = userSettings.getString("ip", "192.168.199.159");
         ip_change.setText(name);
         IP = name;
     }
@@ -298,8 +358,8 @@ public class MainActivity extends AppCompatActivity {
             Comparator<DatasBean> comparator = new Comparator<DatasBean>() {
                 public int compare(DatasBean s1, DatasBean s2) {
                     //先排年龄
-                    if (s1.getOrder() >= s2.getOrder()) {
-                        return s1.getOrder() - s2.getOrder();
+                    if (s1.getCreateTime() < s2.getCreateTime()) {
+                        return (int) (s1.getCreateTime() - s2.getCreateTime());
                     }
                     return 0;
                 }
@@ -308,11 +368,14 @@ public class MainActivity extends AppCompatActivity {
 
             Collections.sort(datasBeans, comparator);
 
+            for (int i = 0; i < datasBeans.size(); i++) {
+                Log.e("", "时间跑徐：" + getDateTimeByMillisecond(datasBeans.get(i).getCreateTime()));
+            }
+
+
         } catch (Exception e) {
 
         }
-
-
     }
 
 
@@ -422,7 +485,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     //发送 线程等
-    String IP = "192.168.0.101";
+    String IP = "192.168.199.159";
     String fliePath = Environment.getExternalStorageDirectory().getAbsolutePath()
             + "/record";
     int PORT = 55239;
@@ -552,5 +615,11 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    public String getDateTimeByMillisecond(long str) {
+        Date date = new Date(str);
+        SimpleDateFormat format = new SimpleDateFormat("MM月dd日 HH:mm:ss");
+        String time = format.format(date);
+        return time;
+    }
 
 }

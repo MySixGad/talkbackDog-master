@@ -5,10 +5,21 @@
     android:orientation="vertical">
 
 
+    <TextView
+        android:textSize="13sp"
+        android:textColor="#000000"
+        android:id="@+id/time"
+        android:layout_marginTop="10dp"
+       android:layout_gravity="center"
+        android:text="11月11日 22:30:23"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="2dp"
         android:orientation="horizontal"
         android:padding="5dp">
 
@@ -26,6 +37,7 @@
 
 
             <ImageView
+                android:id="@+id/llls"
                 android:layout_width="150dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
@@ -33,13 +45,34 @@
                 android:scaleType="fitXY"
                 android:src="@drawable/aab" />
 
-            <TextView
+            <LinearLayout
+                android:gravity="center"
                 android:paddingLeft="10dp"
-                android:textColor="#ffffff"
                 android:layout_centerInParent="true"
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+
+            <TextView
+                android:textSize="11sp"
+                android:id="@+id/vice"
+                android:textColor="#ffffff"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="语音消息" />
+
+            <TextView
+                android:textSize="11sp"
+                android:id="@+id/tie_vice"
+               android:paddingLeft="5dp"
+                android:gravity="center"
+                android:textColor="#ffffff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10s" />
+
+            </LinearLayout>
         </RelativeLayout>
 
     </LinearLayout>
